@@ -15,7 +15,7 @@ spec:
         command: ['sh', '-c', 'until nc -z -v -w30 $MINIO_ENDPOINT 9000; do echo "Waiting for Minio connection..."; sleep 2; done;']
         env:
         - name: MINIO_ENDPOINT
-          value: minio.ic-shared-minio.svc.cluster.local
+          value: minio.fraud-detection.svc.cluster.local
       containers:
       - name: add-images-to-bucket
         image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/s2i-generic-data-science-notebook:1.2

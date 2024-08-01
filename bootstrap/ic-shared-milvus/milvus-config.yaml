@@ -29,7 +29,7 @@ data:
       type: etcd
 
     minio:
-      address: minio.ic-shared-minio.svc.cluster.local
+      address: minio.fraud-detection.svc.cluster.local
       port: 9000
       accessKeyID: minio
       secretAccessKey: minio123
