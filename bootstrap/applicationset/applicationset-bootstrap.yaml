@@ -43,7 +43,7 @@ spec:
         targetRevision: dev
         path: bootstrap/ic-user-projects      
       - cluster: in-cluster
-        name: ic-shared-app
+        name: fraud-detection
         repoURL: https://github.com/redhat-gpte-devopsautomation/fraud-detection-deployment.git
         targetRevision: dev
         path: bootstrap/fraud-detection-deployment
