@@ -26,7 +26,7 @@ spec:
           user_count=$(oc get namespaces | grep showroom | wc -l)
 
           echo -n 'Waiting for minio-root-user secret'
-          while [ -z "\$(oc get secret -n ic-shared-minio minio-root-user -oname 2>/dev/null)" ]; do
+          while [ -z "\$(oc get secret -n fraud-detection minio-root-user -oname 2>/dev/null)" ]; do
             echo -n .
             sleep 5
           done; echo
@@ -38,9 +38,9 @@ spec:
           done; echo
 
           # Get needed variables
-          MINIO_ROOT_USER=$(oc get secret minio-root-user -n ic-shared-minio -o template --template '{{.data.MINIO_ROOT_USER|base64decode}}')
-          MINIO_ROOT_PASSWORD=$(oc get secret minio-root-user -n ic-shared-minio -o template --template '{{.data.MINIO_ROOT_PASSWORD|base64decode}}')
-          MINIO_HOST=https://$(oc get route minio-s3 -n ic-shared-minio -o template --template '{{.spec.host}}')
+          MINIO_ROOT_USER=$(oc get secret minio-root-user -n fraud-detection -o template --template '{{.data.MINIO_ROOT_USER|base64decode}}')
+          MINIO_ROOT_PASSWORD=$(oc get secret minio-root-user -n fraud-detection -o template --template '{{.data.MINIO_ROOT_PASSWORD|base64decode}}')
+          MINIO_HOST=https://$(oc get route minio-s3 -n fraud-detection -o template --template '{{.spec.host}}')
           DASHBOARD_ROUTE=https://$(oc get route rhods-dashboard -n redhat-ods-applications -o jsonpath='{.spec.host}')
 
           # Define some variables
@@ -155,7 +155,7 @@ spec:
                   - |-
                     echo "Minio user: $MINIO_ROOT_USER"
                     echo "Minio pass: $MINIO_ROOT_PASSWORD"
-                    echo "Internal service url: http://minio.ic-shared-minio.svc.cluster.local:9000/"
+                    echo "Internal service url: http://minio.fraud-detection.svc.cluster.local:9000/"
                     cat << EOF | oc apply -f-
                     apiVersion: v1
                     kind: Secret
@@ -172,7 +172,7 @@ spec:
                       AWS_ACCESS_KEY_ID: $MINIO_ROOT_USER
                       AWS_SECRET_ACCESS_KEY: $MINIO_ROOT_PASSWORD
                       AWS_DEFAULT_REGION: us
-                      AWS_S3_ENDPOINT: http://minio.ic-shared-minio.svc:9000
+                      AWS_S3_ENDPOINT: http://minio.fraud-detection.svc:9000
                       AWS_S3_BUCKET: $USER_NAME
                     EOF
                   command:
@@ -217,7 +217,7 @@ spec:
             objectStorage:
               externalStorage:
                 bucket: $USER_NAME
-                host: minio.ic-shared-minio.svc.cluster.local:9000
+                host: minio.fraud-detection.svc.cluster.local:9000
                 port: ''
                 s3CredentialsSecret:
                   accessKey: AWS_ACCESS_KEY_ID
@@ -316,7 +316,7 @@ spec:
           metadata:
             annotations:
               notebooks.opendatahub.io/inject-oauth: 'true'
-              opendatahub.io/image-display-name: CUSTOM - Insurance Claim Processing Lab Workbench
+              opendatahub.io/image-display-name: CUSTOM - Fraud Detection Workbench
               notebooks.opendatahub.io/oauth-logout-url: >-
                 $DASHBOARD_ROUTE/projects/$USER_PROJECT?notebookLogout=$WORKBENCH_NAME
               opendatahub.io/accelerator-name: ''
@@ -516,7 +516,7 @@ spec:
                   args:
                   - -ec
                   - |-
-                    pod_name=\$(oc get pods --selector=app=$WORKBENCH_NAME -o jsonpath='{.items[0].metadata.name}') && oc exec \$pod_name -- git clone https://github.com/rh-aiservices-bu/parasol-insurance
+                    pod_name=\$(oc get pods --selector=app=$WORKBENCH_NAME -o jsonpath='{.items[0].metadata.name}') && oc exec \$pod_name -- git clone https://github.com/rh-aiservices-bu/fraud-detection.git
                 restartPolicy: Never
           EOF
 
